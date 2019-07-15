@@ -13,11 +13,25 @@ const AuthView = () => (
   </div>
 );
 
+const getUserId = token => {
+  
+  
+  let base64Url = token.split('.')[1];
+  let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  
+  
+  return JSON.parse(jsonPayload).user_id;
+};
+
 class SignIn extends Component {
   constructor(props) {
     super(props);
     
     this.state = {
+      userId: null,
       email: "",
       password: "",
       accessToken: "",
@@ -60,8 +74,11 @@ class SignIn extends Component {
       }
   
       const content = await rawResponse.json();
-      
+  
+      let userId = getUserId(content.accessToken);
+  
       localStorage.setItem('info', JSON.stringify({
+        userId: userId,
         accessToken: content.accessToken,
         refreshToken: content.refreshToken,
         expires: content.expires,

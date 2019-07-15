@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Button, FormGroup, FormControl } from "react-bootstrap";
 import LoaderWrapper from '../../Components/Loader/index';
-import { CREATE_LEVEL } from '../../constants/index';
+import { CREATE_LEVEL, REFRESH_TOKEN } from '../../constants/index';
 
 import './index.css';
 
@@ -158,6 +158,25 @@ export default class Dashboard extends Component {
     this.setState(state => ({ ...state, loading: false }));
   };
   
+  refreshTokenFuncAsync = async (userId, refreshToken) => {
+    const refreshTokenBody = {
+      refreshToken: refreshToken
+    };
+    
+    const refreshTokenSettings = {
+      method: "POST",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'userId': userId,
+      },
+      body: JSON.stringify(refreshTokenBody)
+    };
+    
+    return await fetch(REFRESH_TOKEN, refreshTokenSettings);
+  };
+  
   handleSubmitAsync = async (e) => {
     e.preventDefault();
     
@@ -166,8 +185,8 @@ export default class Dashboard extends Component {
     if (!confirm) {
       return false;
     }
-    
-    let { email, password } = JSON.parse(localStorage.getItem("info"));
+  
+    let { email, password, accessToken, refreshToken, userId } = JSON.parse(localStorage.getItem("info"));
     
     const body = {
       logoUrl: this.state.logoUrl.value,
@@ -190,21 +209,62 @@ export default class Dashboard extends Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify(body)
     };
   
     (async () => {
       this.setState(state => ({ ...state, loading: true }));
-      
+  
       const rawResponse = await fetch(CREATE_LEVEL, settings);
     
       if (rawResponse.status > 205 && rawResponse.status < 500) {
-        this.setState(state => ({ loading: false }));
-      
-        window.alert(errorMessage);
-      
-        return false;
+  
+        const refreshTokenResult = await this.refreshTokenFuncAsync(userId, refreshToken);
+  
+        if (refreshTokenResult.status > 205 && refreshTokenResult.status < 500) {
+          
+          this.setState(state => ({ loading: false }));
+  
+          window.alert(errorMessage);
+  
+          return false;
+        }
+  
+        const content = await refreshTokenResult.json();
+  
+        const oldData = JSON.parse(localStorage.getItem("info"));
+  
+        oldData.accessToken = content.accessToken;
+        oldData.refreshToken = content.refreshToken;
+  
+        localStorage.setItem("info", JSON.stringify(oldData));
+  
+        const newSettings = {
+          method: "POST",
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${content.accessToken}`
+          },
+          body: JSON.stringify(body)
+        };
+  
+        const rawSecondResponse = await fetch(CREATE_LEVEL, newSettings);
+        
+        if (rawSecondResponse.status > 205 && rawSecondResponse.status < 500) {
+          this.setState(state => ({ loading: false }));
+  
+          window.alert(errorMessage);
+  
+          localStorage.removeItem('info');
+  
+          this.props.history.push('/');
+  
+          return false;
+        }
       }
     
       this.setState(state => ({
