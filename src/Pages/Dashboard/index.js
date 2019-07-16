@@ -196,7 +196,7 @@ export default class Dashboard extends Component {
       description: this.state.description.value,
       subtitle: this.state.subtitle.value,
       steps: this.state.steps,
-      presentPrice: this.state.presentPrice.value,
+      percentPrice: this.state.presentPrice.value,
       injection: {
         email: email,
         password: password
