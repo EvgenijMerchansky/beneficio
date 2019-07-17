@@ -378,7 +378,7 @@ export default class Dashboard extends Component {
                 </FormGroup>
                 <div className="multi-column-fields">
                   <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-                    <p className="form-multiply-subtitle">Title (Level title):</p>
+                    <p className="form-multiply-subtitle">Title (Level title - max 25 characters!):</p>
                     <FormControl
                       placeholder="Title"
                       autoFocus
