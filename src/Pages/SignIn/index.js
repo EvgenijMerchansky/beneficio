@@ -76,20 +76,20 @@ class SignIn extends Component {
   
       localStorage.setItem('info', JSON.stringify({
         userId: userId,
-        accessToken: content.accessToken,
-        refreshToken: content.refreshToken,
-        expires: content.expires,
         email: email,
         password: password,
       }));
   
       this.setState(state => ({
         ...state,
+        loading: false
+      }));
+  
+      this.props.history.creeds = {
         accessToken: content.accessToken,
         refreshToken: content.refreshToken,
         expires: content.expires,
-        loading: false
-      }));
+      };
       
       this.props.history.push('/dashboard');
     })();

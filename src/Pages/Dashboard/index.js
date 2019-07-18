@@ -117,27 +117,32 @@ export default class Dashboard extends Component {
         value: "",
         isValid: false
       },
-      
       temporaryStep: {
         title: "",
         description: "",
         imageUrl: "",
       },
-      
       stepValid: false,
-      loading: false
+      loading: false,
+      creeds: {
+        accessToken: "",
+        refreshToken: "",
+        expires: ""
+      }
     };
   }
   
   componentWillUnmount() {
     
-    localStorage.removeItem('info');
+    //localStorage.removeItem('info');
   }
   
   componentWillMount() {
-    let aValue = localStorage.getItem("info");
+    this.setState(state => ({ ...state, creeds: { ...this.props.history.creeds} }));
   
-    if (aValue === null) {
+    if (this.props.history.creeds === undefined ||
+        this.props.history.creeds === null ||
+        Object.keys(this.props.history.creeds).length === 0) {
       this.props.history.push('/');
     }
   }
@@ -158,9 +163,12 @@ export default class Dashboard extends Component {
     this.setState(state => ({ ...state, loading: false }));
   };
   
-  refreshTokenFuncAsync = async (userId, refreshToken) => {
+  refreshTokenFuncAsync = async () => {
+  
+    let { userId } = JSON.parse(localStorage.getItem("info"));
+    
     const refreshTokenBody = {
-      refreshToken: refreshToken
+      refreshToken: this.state.creeds.refreshToken
     };
     
     const refreshTokenSettings = {
@@ -174,11 +182,16 @@ export default class Dashboard extends Component {
       body: JSON.stringify(refreshTokenBody)
     };
     
-    return await fetch(REFRESH_TOKEN, refreshTokenSettings);
+    let refreshed = await fetch(REFRESH_TOKEN, refreshTokenSettings);
+    const content = await refreshed.json();
+  
+    this.setState(state => ({ ...state, creeds: { ...content }}));
   };
   
   handleSubmitAsync = async (e) => {
     e.preventDefault();
+  
+    this.setState(state => ({ ...state, loading: true }));
     
     let confirm = window.confirm("Do you really want create this level ?");
     
@@ -186,7 +199,7 @@ export default class Dashboard extends Component {
       return false;
     }
   
-    let { email, password, accessToken, refreshToken, userId } = JSON.parse(localStorage.getItem("info"));
+    let { email, password } = JSON.parse(localStorage.getItem("info"));
     
     const body = {
       logoUrl: this.state.logoUrl.value,
@@ -209,37 +222,17 @@ export default class Dashboard extends Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
+        'Authorization': `Bearer ${this.state.creeds.accessToken}`
       },
       body: JSON.stringify(body)
     };
   
     (async () => {
-      this.setState(state => ({ ...state, loading: true }));
-  
       const rawResponse = await fetch(CREATE_LEVEL, settings);
     
       if (rawResponse.status > 205 && rawResponse.status < 500) {
   
-        const refreshTokenResult = await this.refreshTokenFuncAsync(userId, refreshToken);
-  
-        if (refreshTokenResult.status > 205 && refreshTokenResult.status < 500) {
-          
-          this.setState(state => ({ loading: false }));
-  
-          window.alert(errorMessage);
-  
-          return false;
-        }
-  
-        const content = await refreshTokenResult.json();
-  
-        const oldData = JSON.parse(localStorage.getItem("info"));
-  
-        oldData.accessToken = content.accessToken;
-        oldData.refreshToken = content.refreshToken;
-  
-        localStorage.setItem("info", JSON.stringify(oldData));
+        await this.refreshTokenFuncAsync();
   
         const newSettings = {
           method: "POST",
@@ -247,33 +240,31 @@ export default class Dashboard extends Component {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${content.accessToken}`
+            'Authorization': `Bearer ${this.state.creeds.accessToken}`
           },
           body: JSON.stringify(body)
         };
-  
-        const rawSecondResponse = await fetch(CREATE_LEVEL, newSettings);
         
-        if (rawSecondResponse.status > 205 && rawSecondResponse.status < 500) {
-          this.setState(state => ({ loading: false }));
+        await fetch(CREATE_LEVEL, newSettings);
   
-          window.alert(errorMessage);
+        this.setState(state => ({
+          ...state,
+          ...globalReseter,
+          loading: false
+        }));
   
-          localStorage.removeItem('info');
+        window.alert("Level successfully created!");
+        
+        return false;
+      } else {
+        this.setState(state => ({
+          ...state,
+          ...globalReseter,
+          loading: false
+        }));
   
-          this.props.history.push('/');
-  
-          return false;
-        }
+        window.alert("Level successfully created!");
       }
-    
-      this.setState(state => ({
-        ...state,
-        ...globalReseter,
-        loading: false
-      }));
-    
-      window.alert("Level successfully created!");
     })();
   };
   
@@ -317,7 +308,6 @@ export default class Dashboard extends Component {
   };
   
   addStep = value => {
-    
     this.setState(state => ({
       ...state,
       steps: [...this.state.steps, value],
@@ -357,7 +347,7 @@ export default class Dashboard extends Component {
       subtitle.isValid &&
       presentPrice.isValid &&
       steps.length > 0;
-    
+  
     return (
       <div className="Dashboard">
         {this.state.loading ? <LoaderWrapper/> :
