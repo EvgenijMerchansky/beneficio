@@ -1,3 +1,3 @@
-export const SIGNIN = "http://merchansky-001-site1.dtempurl.com/api/users/signin";
-export const CREATE_LEVEL = "http://merchansky-001-site1.dtempurl.com/api/levels/create";
-export const REFRESH_TOKEN = "http://merchansky-001-site1.dtempurl.com/api/users/token/refresh";
+export const SIGN_IN = "https://lodiumwebapi20190725104425.azurewebsites.net/api/users/signin";
+export const CREATE_LEVEL = "https://lodiumwebapi20190725104425.azurewebsites.net/api/levels/create";
+export const REFRESH_TOKEN = "https://lodiumwebapi20190725104425.azurewebsites.net/api/users/token/refresh";

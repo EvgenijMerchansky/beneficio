@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Button, FormGroup, FormControl } from "react-bootstrap";
-import { SIGNIN } from "../../constants/index";
+import { SIGN_IN } from "../../constants/index";
 import LoaderWrapper from '../../Components/Loader/index';
 import './index.css';
 
@@ -60,7 +60,7 @@ class SignIn extends Component {
     };
   
     (async () => {
-      const rawResponse = await fetch(SIGNIN, settings);
+      const rawResponse = await fetch(SIGN_IN, settings);
   
       if (rawResponse.status > 205 && rawResponse.status < 500) {
         this.setState(state => ({ loading: false }));
