@@ -165,6 +165,8 @@ export default class Dashboard extends Component {
   
   refreshTokenFuncAsync = async () => {
   
+    this.setState(state => ({ ...state, loading: true }));
+  
     let { userId } = JSON.parse(localStorage.getItem("info"));
     
     const refreshTokenBody = {
@@ -183,9 +185,20 @@ export default class Dashboard extends Component {
     };
     
     let refreshed = await fetch(REFRESH_TOKEN, refreshTokenSettings);
+  
+    if (refreshed.status > 205 && refreshed.status < 500) {
+      window.alert("Refresh token failed!");
+      
+      return false;
+    }
+    
     const content = await refreshed.json();
   
-    this.setState(state => ({ ...state, creeds: { ...content }}));
+    this.setState(state => ({ ...state, creeds: { ...content }, loading: false }));
+  
+    window.alert("Refresh token success!");
+    
+    return true;
   };
   
   handleSubmitAsync = async (e) => {
@@ -232,7 +245,11 @@ export default class Dashboard extends Component {
     
       if (rawResponse.status > 205 && rawResponse.status < 500) {
   
-        await this.refreshTokenFuncAsync();
+        let tokenIsRefreshed = await this.refreshTokenFuncAsync();
+        
+        if (!tokenIsRefreshed) {
+          await this.refreshTokenFuncAsync();
+        }
   
         const newSettings = {
           method: "POST",
@@ -245,7 +262,13 @@ export default class Dashboard extends Component {
           body: JSON.stringify(body)
         };
         
-        await fetch(CREATE_LEVEL, newSettings);
+        let response = await fetch(CREATE_LEVEL, newSettings);
+  
+        if (response.status > 205 && response.status < 500) {
+          window.alert("Level was not created.");
+    
+          return false;
+        }
   
         this.setState(state => ({
           ...state,
@@ -256,6 +279,7 @@ export default class Dashboard extends Component {
         window.alert("Level successfully created!");
         
         return false;
+        
       } else {
         this.setState(state => ({
           ...state,
