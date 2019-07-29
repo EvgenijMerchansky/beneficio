@@ -34,8 +34,6 @@ const Step = ({ item, index, onDelete }) => (
   </div>
 );
 
-const errorMessage = "Something was wrong:\n1. Server error.\nPlease, try again";
-
 const temporaryStepReseter = {
   title: "",
   description: "",
@@ -130,11 +128,6 @@ export default class Dashboard extends Component {
         expires: ""
       }
     };
-  }
-  
-  componentWillUnmount() {
-    
-    //localStorage.removeItem('info');
   }
   
   componentWillMount() {
