@@ -477,7 +477,7 @@ export default class Dashboard extends Component {
                     onChange={e => this.validateStepAsync("title", e.target.value)}
                   />
                   <FormControl
-                    placeholder="Step description:"
+                    placeholder="Step description (500 characters):"
                     autoFocus
                     className="form-control-level step-field"
                     type="text"
