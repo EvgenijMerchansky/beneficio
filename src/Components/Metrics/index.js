@@ -9,8 +9,11 @@ export default class Metrics extends Component {
   }
   
   render() {
-    return(
-      <h1 className="Login-title">Metrics</h1>
-    )
+    return [
+      <h1 className="Login-title">Metrics</h1>,
+      <div className="container-metrics">
+        <h1 className="test-desc">Coming soon...</h1>
+      </div>
+    ]
   }
 }
