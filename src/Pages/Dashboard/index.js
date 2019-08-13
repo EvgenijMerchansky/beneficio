@@ -1,38 +1,13 @@
 import React, { Component } from "react";
-import { Button, FormGroup, FormControl } from "react-bootstrap";
 import LoaderWrapper from '../../Components/Loader/index';
-import { CREATE_LEVEL, REFRESH_TOKEN } from '../../constants/index';
+import NewLevelForm from '../../Components/NewLevelForm/index';
+import LevelsList from '../../Components/LevelsList/index';
+import Metrics from '../../Components/Metrics/index';
+import { Button } from "react-bootstrap";
+import { CREATE_LEVEL, REFRESH_TOKEN, GET_LEVELS_LIST } from '../../constants/index';
+import Tabs from "../../Components/Tabs/index";
 
 import './index.css';
-
-const Step = ({ item, index, onDelete }) => (
-  <div className="completed-step-item">
-    <div className="step-header">
-      <div className="step-index">
-        Step {index + 1}.
-      </div>
-      <div className="step-delete">
-        <Button
-          className="step-delete-btn"
-          onClick={() => onDelete(index) }
-        >
-          Delete
-        </Button>
-      </div>
-    </div>
-    <div className="step-body">
-      <div className="step-body-title" alt={item.title}>
-        Title: {item.title}
-      </div>
-      <div className="step-body-description" alt={item.description}>
-        Description: {item.description}
-      </div>
-      <div className="step-body-imgUrl" alt={item.imageUrl}>
-        Image link: {item.imageUrl}
-      </div>
-    </div>
-  </div>
-);
 
 const temporaryStepReseter = {
   title: "",
@@ -126,9 +101,18 @@ export default class Dashboard extends Component {
         accessToken: "",
         refreshToken: "",
         expires: ""
-      }
+      },
+      levels: {
+        activeCount: 0,
+        activeList: [],
+        completedCount: 0,
+        completedList: []
+      },
+      activeTab: "create"
     };
   }
+  
+  controller = new AbortController();
   
   componentWillMount() {
     this.setState(state => ({ ...state, creeds: { ...this.props.history.creeds} }));
@@ -140,8 +124,12 @@ export default class Dashboard extends Component {
     }
   }
   
+  componentDidMount() {
+    this.getAllLevelsAsync();
+  }
+  
   logOutAsync = async () => {
-    let confirmation = window.confirm("Do you really want to leave?");
+    let confirmation = window.confirm("Do you really want to LEAVE?");
     
     if (!confirmation) {
       return false;
@@ -157,6 +145,7 @@ export default class Dashboard extends Component {
   };
   
   refreshTokenFuncAsync = async () => {
+    
   
     this.setState(state => ({ ...state, loading: true }));
   
@@ -180,8 +169,6 @@ export default class Dashboard extends Component {
     let refreshed = await fetch(REFRESH_TOKEN, refreshTokenSettings);
   
     if (refreshed.status > 205 && refreshed.status < 500) {
-      window.alert("Refresh token failed!");
-      
       return false;
     }
     
@@ -199,7 +186,7 @@ export default class Dashboard extends Component {
   
     this.setState(state => ({ ...state, loading: true }));
     
-    let confirm = window.confirm("Do you really want create this level ?");
+    let confirm = window.confirm("Do you really want CREATE this level ?");
     
     if (!confirm) {
       return false;
@@ -235,7 +222,7 @@ export default class Dashboard extends Component {
   
     (async () => {
       const rawResponse = await fetch(CREATE_LEVEL, settings);
-    
+      
       if (rawResponse.status > 205 && rawResponse.status < 500) {
   
         let tokenIsRefreshed = await this.refreshTokenFuncAsync();
@@ -281,6 +268,74 @@ export default class Dashboard extends Component {
         }));
   
         window.alert("Level successfully created!");
+      }
+    })();
+  };
+  
+  deleteLevelAsync = async (levelId) => {
+    
+    let confirm = window.confirm("Do you really want DELETE this level ?");
+  
+    if (!confirm) {
+      return false;
+    }
+    
+    // this.setState(state => ({ ...state, loading: true }));
+  };
+  
+  getAllLevelsAsync = async () => {
+    this.setState(state => ({ ...state, loading: true }));
+  
+    let { userId } = JSON.parse(localStorage.getItem("info"));
+  
+    const settings = {
+      method: "GET",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.state.creeds.accessToken}`,
+        'userId': userId
+      },
+      signal: this.controller.signal
+    };
+  
+    (async () => {
+      const rawResponse = await fetch(GET_LEVELS_LIST, settings);
+  
+      if (rawResponse.status > 205 && rawResponse.status < 500) {
+        await this.refreshTokenFuncAsync();
+
+        const newSettings = {
+          method: "GET",
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.state.creeds.accessToken}`,
+            'userId': userId
+          }
+        };
+  
+        let response = await fetch(GET_LEVELS_LIST, newSettings);
+  
+        const content = await response.json();
+  
+        this.setState(state => ({
+          ...state,
+          levels: {...content},
+          loading: false
+        }));
+  
+        return false;
+      } else {
+        const content = await rawResponse.json();
+        
+        this.setState(state => ({
+          ...state,
+          levels: {...content},
+          loading: false
+        }));
       }
     })();
   };
@@ -337,10 +392,18 @@ export default class Dashboard extends Component {
   
   deleteStep = (index) => {
   
-    let newSteps = this.state.steps.filter((item, elemIndex) => elemIndex != index);
+    let newSteps = this.state.steps.filter((item, elemIndex) => elemIndex !== index);
   
     this.setState(state => ({ ...state, steps: [ ...newSteps ] }));
   };
+  
+  switchTab = (value) => {
+    this.setState(state => ({ ...state, activeTab: value }))
+  };
+  
+  componentWillUnmount() {
+    this.controller.abort();
+  }
   
   render() {
   
@@ -365,166 +428,59 @@ export default class Dashboard extends Component {
       presentPrice.isValid &&
       steps.length > 0;
   
+    if (this.state.loading) {
+      return <LoaderWrapper/>;
+    }
+  
     return (
       <div className="Dashboard">
-        {this.state.loading ? <LoaderWrapper/> :
-          [<h1 key="1" className="Login-title">New level</h1>,
-            <div key="2" className="form-wrapper">
-              <form onSubmit={(e) => this.handleSubmitAsync(e)}>
-                <FormGroup controlId="text" bsSize="large">
-                  <p className="form-subtitle">Logo url (Level logotype link):</p>
-                  <FormControl
-                    placeholder="Logo url"
-                    autoFocus
-                    className="form-control-level"
-                    type="text"
-                    name="logoUrl"
-                    value={this.state.logoUrl.value}
-                    onChange={e => this.validateFieldAsync("logoUrl", e.target.value)}
-                  />
-                </FormGroup>
-                <div className="multi-column-fields">
-                  <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-                    <p className="form-multiply-subtitle">Title (Level title - max 25 characters!):</p>
-                    <FormControl
-                      placeholder="Title"
-                      autoFocus
-                      className="form-multiply-control-level"
-                      type="text"
-                      name="title"
-                      value={this.state.title.value}
-                      onChange={e => this.validateFieldAsync("title", e.target.value)}
-                    />
-                  </FormGroup>
-                  <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-                    <p className="form-multiply-subtitle">Time (Level passing time):</p>
-                    <FormControl
-                      autoFocus
-                      placeholder="Time"
-                      className="form-multiply-control-level"
-                      type="text"
-                      name="time"
-                      value={this.state.time.value}
-                      onChange={e => this.validateFieldAsync("time", e.target.value)}
-                    />
-                  </FormGroup>
-                </div>
-                <FormGroup controlId="text" bsSize="large">
-                  <p className="form-subtitle">Description (Short level description):</p>
-                  <FormControl
-                    autoFocus
-                    placeholder="Description"
-                    className="form-textarea-level"
-                    type="text"
-                    as="textarea"
-                    rows="3"
-                    name="description"
-                    value={this.state.description.value}
-                    onChange={e => this.validateFieldAsync("description", e.target.value)}
-                  />
-                </FormGroup>
-                <div className="multi-column-fields">
-                  <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-                    <p className="form-multiply-subtitle">Possible earnings (USD):</p>
-                    <FormControl
-                      placeholder="0.00"
-                      autoFocus
-                      className="form-multiply-control-level"
-                      type="text"
-                      name="possibleEarnings"
-                      value={this.state.possibleEarnings.value}
-                      onChange={e => this.validateFieldAsync("possibleEarnings", e.target.value)}
-                    />
-                  </FormGroup>
-                  <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-                    <p className="form-multiply-subtitle">Present price (USD):</p>
-                    <FormControl
-                      placeholder="0.00"
-                      autoFocus
-                      className="form-multiply-control-level"
-                      type="text"
-                      name="presentPrice"
-                      value={this.state.presentPrice.value}
-                      onChange={e => this.validateFieldAsync("presentPrice", e.target.value)}
-                    />
-                  </FormGroup>
-                </div>
-                <FormGroup controlId="text" bsSize="large">
-                  <p className="form-subtitle">Subtitle (Steps to reproduce):</p>
-                  <FormControl
-                    placeholder="Subtitle"
-                    autoFocus
-                    className="form-control-level"
-                    type="text"
-                    name="subtitle"
-                    value={this.state.subtitle.value}
-                    onChange={e => this.validateFieldAsync("subtitle", e.target.value)}
-                  />
-                </FormGroup>
-                <div className="steps-wrapper-container">
-                  {this.state.steps.map((item, index) =>
-                    <Step key={index+item} item={item} index={index} onDelete={this.deleteStep}/>)}
-                </div>
-                <FormGroup controlId="text" bsSize="large">
-                  <p className="step-subtitle">Steps:</p>
-                  <FormControl
-                    placeholder="Step title:"
-                    autoFocus
-                    className="form-control-level step-field"
-                    type="text"
-                    name="temporaryStep"
-                    value={this.state.temporaryStep.title}
-                    onChange={e => this.validateStepAsync("title", e.target.value)}
-                  />
-                  <FormControl
-                    placeholder="Step description (500 characters):"
-                    autoFocus
-                    className="form-control-level step-field"
-                    type="text"
-                    name="temporaryStep"
-                    value={this.state.temporaryStep.description}
-                    onChange={e => this.validateStepAsync("description", e.target.value)}
-                  />
-                  <FormControl
-                    placeholder="Step image url (optional):"
-                    autoFocus
-                    className="form-control-level step-field"
-                    type="text"
-                    name="temporaryStep"
-                    value={this.state.temporaryStep.imageUrl}
-                    onChange={e => this.validateStepAsync("imageUrl", e.target.value)}
-                  />
-                  <Button
-                    block
-                    bsSize="large"
-                    className={this.state.stepValid ? "step-add-button" : "step-add-button-invalid"}
-                    disabled={!this.state.stepValid}
-                    onClick={value => this.addStep(this.state.temporaryStep)}
-                  >
-                    Add step
-                  </Button>
-                </FormGroup>
-                <Button
-                  block
-                  bsSize="large"
-                  className={!valid ? "submit-btn-error" : "submit-btn"}
-                  disabled={!valid}
-                  type="submit"
-                >
-                  Create level
-                </Button>
-              </form>
-              <Button
-                key="2"
-                block
-                bsSize="large"
-                className="log-out-btn"
-                onClick={() => this.logOutAsync()}
-              >
-                Log out
-              </Button>
-            </div>
-          ]}
+        
+        <Tabs
+          switchTab={this.switchTab}
+          activeTab={this.state.activeTab}
+        />
+        
+        {
+          this.state.activeTab === "create" &&
+          <NewLevelForm
+            handleSubmitAsync={this.handleSubmitAsync}
+            validateFieldAsync={this.validateFieldAsync}
+            validateStepAsync={this.validateStepAsync}
+            deleteStep={this.deleteStep}
+            addStep={this.addStep}
+            logoUrl={this.state.logoUrl.value}
+            title={this.state.title.value}
+            time={this.state.time.value}
+            description={this.state.description.value}
+            possibleEarnings={this.state.possibleEarnings.value}
+            presentPrice={this.state.presentPrice.value}
+            subtitle={this.state.subtitle.value}
+            steps={this.state.steps}
+            temporaryStep={this.state.temporaryStep}
+            stepValid={this.state.stepValid}
+            valid={valid}
+          />
+        }
+        
+        {
+          this.state.activeTab === "levels" &&
+          <LevelsList
+            levels={this.state.levels.activeList}
+            levelsAmount={this.state.levels.activeCount}
+            onLevelDelete={this.deleteLevelAsync}
+          />
+        }
+        
+        {
+          this.state.activeTab === "metrics" && <Metrics/>
+        }
+        
+        <Button
+          className="log-out-btn"
+          onClick={() => this.logOutAsync()}
+        >
+          Exit
+        </Button>
       </div>
     );
   }

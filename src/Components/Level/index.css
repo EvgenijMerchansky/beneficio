@@ -1,0 +1,67 @@
+.container-level {
+    background-color: #fff;
+    border-radius: 4px;
+    border: solid 1px #e4e4e5;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.info-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 20px;
+    width: 250px;
+}
+
+.level-img {
+    width: 205px;
+    height: 205px;
+    background-size: cover;
+    border-right: solid 1px #e4e4e5;
+}
+
+.subtitle-wrapper {
+    color: #147efb;
+}
+
+.level-info-subtitle {
+    color: #626262;
+}
+
+.delete-level-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    width: 50%;
+    height: 40px;
+    text-align: right;
+}
+
+.delete-level-button {
+    width: 60px;
+    height: inherit;
+    margin-right: 30px;
+    background-color: #ff2a02;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 15px;
+    outline: none;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+    border-radius: 5px;
+    font-weight: 400;
+}
+
+.delete-level-button:hover {
+    background-color: #d60600;
+}

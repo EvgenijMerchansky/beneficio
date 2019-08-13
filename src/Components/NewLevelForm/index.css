@@ -1,0 +1,136 @@
+.form-control-level {
+    width: 95%;
+    height: 3em;
+    padding: 0 10px 0 10px;
+    font-family: 'Roboto', sans-serif;
+    color: #282c34ba;
+    border-radius: 4px;
+    border-color: #bebebe;
+    border-style: solid;
+    outline: none;
+    border-width: 1px;
+}
+
+.form-multiply-control-level {
+    width: 90%;
+    height: 3em;
+    padding: 0 10px 0 10px;
+    font-family: 'Roboto', sans-serif;
+    color: #282c34ba;
+    border-radius: 4px;
+    border-color: #bebebe;
+    border-style: solid;
+    outline: none;
+    border-width: 1px;
+}
+
+.form-textarea-level {
+    width: 95%;
+    min-height: 10em;
+    padding: 10px;
+    font-family: 'Roboto', sans-serif;
+    color: #282c34ba;
+    background-color: white!important;
+    font-size: 18px;
+    border-radius: 4px;
+    border-color: #bebebe;
+    border-style: solid;
+    outline: none;
+    border-width: 1px;
+}
+
+.multiply-form-group {
+    width: 100%;
+}
+
+.form-subtitle {
+    width: 95%;
+    text-align: start;
+    padding-left: .3em;
+    color: #282c34ba;
+    margin-bottom: 7px;
+}
+
+.step-subtitle {
+    width: 95%;
+    text-align: start;
+    padding-left: 3.3em;
+    color: #282c34ba;
+    margin-bottom: 7px;
+}
+
+.form-multiply-subtitle {
+    width: 90%;
+    text-align: start;
+    padding-left: .3em;
+    color: #282c34ba;
+    margin-bottom: 7px;
+}
+
+.multi-column-fields {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.step-field {
+    margin-left: 4em;
+    margin-bottom: 1em;
+    width: 87%;
+    height: 3em;
+    padding: 0 10px 0 10px;
+    font-family: 'Roboto', sans-serif;
+    color: #282c34ba;
+    border-radius: 4px;
+    border-color: #bebebe;
+    border-style: solid;
+    outline: none;
+    border-width: 1px;
+}
+
+.step-add-button {
+    margin-top: 2em;
+    width: 17%;
+    height: 3em;
+    border-radius: 5px;
+    background-color: #00e428;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+    outline: none;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.step-add-button:hover {
+    background-color: #25cf00;
+}
+
+.step-add-button-invalid {
+    background-color: #83ff72;
+    margin-top: 2em;
+    width: 17%;
+    height: 3em;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    font-size: 12px;
+    outline: none;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+    cursor: not-allowed;
+}
+
+.steps-wrapper-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+}

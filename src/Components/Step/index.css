@@ -1,0 +1,84 @@
+.completed-step-item {
+    width: 237px;
+    min-height: 100px;
+    border-radius: 3px;
+    background-color: #dddddd;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: solid 1px #cbcbcb;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.completed-step-item:hover {
+    background-color: #cbcbcb;
+    border: solid 1px #a6a6a6
+}
+
+.step-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.step-index {
+    background-color: #fff;
+    padding: 3px 10px;
+    border-radius: 40px;
+    border: solid 1px #a6a6a6
+}
+
+.step-delete-btn {
+    padding: 3px 10px;
+    background-color: white;
+    border: solid 1px #a6a6a6;
+    border-radius: 40px;
+    cursor: pointer;
+    outline: none;
+}
+
+.step-delete-btn:hover {
+    background-color: white;
+    border: solid 1px #a6a6a6;
+}
+
+.step-body {
+    width: 100%;
+    display: inline-block;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    font-size: 12px;
+}
+
+.step-body-title {
+    text-align: start;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.step-body-description {
+    text-align: start;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.step-body-imgUrl {
+    text-align: start;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 8px;
+}
