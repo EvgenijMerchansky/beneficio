@@ -493,14 +493,8 @@ export default class Dashboard extends Component {
         {
           this.state.activeTab === "levels" &&
           <LevelsList
-            //levels={this.state.levels.activeList}
-            levels={[]}
-            //levelsAmount={this.state.levels.activeCount}
-            levelsAmount="4"
             onLevelDelete={this.deleteLevelAsync}
             onGetLevelsList={this.getAllLevelsAsync}
-            onLoadingEnable={this.enableLoading}
-            onLoadingDisable={this.disableLoading}
           />
         }
         

@@ -25,14 +25,14 @@ export default class LevelsList extends Component {
   }
   
   render() {
-    let { levels, levelsAmount, onLevelDelete } = this.props;
+    let { onLevelDelete } = this.props;
   
     if (this.state.loading) {
       return <LoaderWrapper/>;
     }
     
     return[
-      <h1 className="Login-title">Levels list ({levelsAmount})</h1>,
+      <h1 className="Login-title">Levels list ({this.state.levels.activeList.length})</h1>,
       <div className="container">
         {
           this.state.levels.activeList.map(item =>
