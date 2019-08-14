@@ -4,7 +4,7 @@ import NewLevelForm from '../../Components/NewLevelForm/index';
 import LevelsList from '../../Components/LevelsList/index';
 import Metrics from '../../Components/Metrics/index';
 import { Button } from "react-bootstrap";
-import { CREATE_LEVEL, REFRESH_TOKEN, GET_LEVELS_LIST } from '../../constants/index';
+import { CREATE_LEVEL, REFRESH_TOKEN, GET_LEVELS_LIST, DELETE_LEVEL } from '../../constants/index';
 import Tabs from "../../Components/Tabs/index";
 
 import './index.css';
@@ -102,12 +102,6 @@ export default class Dashboard extends Component {
         refreshToken: "",
         expires: ""
       },
-      levels: {
-        activeCount: 0,
-        activeList: [],
-        completedCount: 0,
-        completedList: []
-      },
       activeTab: "create"
     };
   }
@@ -122,10 +116,6 @@ export default class Dashboard extends Component {
         Object.keys(this.props.history.creeds).length === 0) {
       this.props.history.push('/');
     }
-  }
-  
-  componentDidMount() {
-    this.getAllLevelsAsync();
   }
   
   logOutAsync = async () => {
@@ -280,12 +270,64 @@ export default class Dashboard extends Component {
       return false;
     }
     
-    // this.setState(state => ({ ...state, loading: true }));
+    this.setState(state => ({ ...state, loading: true }));
+  
+    let { email, password } = JSON.parse(localStorage.getItem("info"));
+  
+    const body = {
+      levelId: levelId,
+      injection: {
+        email: email,
+        password: password
+      }
+    };
+  
+    const settings = {
+      method: "POST",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.state.creeds.accessToken}`
+      },
+      body: JSON.stringify(body)
+    };
+  
+    (async () => {
+      const rawResponse = await fetch(DELETE_LEVEL, settings);
+    
+      if (rawResponse.status > 205 && rawResponse.status < 500) {
+        await this.refreshTokenFuncAsync();
+      
+        const newSettings = {
+          method: "POST",
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.state.creeds.accessToken}`,
+            'body': JSON.stringify(body)
+          }
+        };
+      
+        await fetch(DELETE_LEVEL, newSettings);
+      
+        this.setState(state => ({
+          ...state,
+          loading: false
+        }));
+      
+        return false;
+      } else {
+        this.setState(state => ({
+          ...state,
+          loading: false
+        }));
+      }
+    })();
   };
   
   getAllLevelsAsync = async () => {
-    this.setState(state => ({ ...state, loading: true }));
-  
     let { userId } = JSON.parse(localStorage.getItem("info"));
   
     const settings = {
@@ -299,45 +341,31 @@ export default class Dashboard extends Component {
       },
       signal: this.controller.signal
     };
-  
-    (async () => {
-      const rawResponse = await fetch(GET_LEVELS_LIST, settings);
-  
-      if (rawResponse.status > 205 && rawResponse.status < 500) {
-        await this.refreshTokenFuncAsync();
+    
+    const rawResponse = await fetch(GET_LEVELS_LIST, settings);
 
-        const newSettings = {
-          method: "GET",
-          mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.state.creeds.accessToken}`,
-            'userId': userId
-          }
-        };
-  
-        let response = await fetch(GET_LEVELS_LIST, newSettings);
-  
-        const content = await response.json();
-  
-        this.setState(state => ({
-          ...state,
-          levels: {...content},
-          loading: false
-        }));
-  
-        return false;
-      } else {
-        const content = await rawResponse.json();
-        
-        this.setState(state => ({
-          ...state,
-          levels: {...content},
-          loading: false
-        }));
-      }
-    })();
+    if (rawResponse.status > 205 && rawResponse.status < 500) {
+      await this.refreshTokenFuncAsync();
+
+      const newSettings = {
+        method: "GET",
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.state.creeds.accessToken}`,
+          'userId': userId
+        }
+      };
+
+      let response = await fetch(GET_LEVELS_LIST, newSettings);
+
+      return await response.json();
+      
+    } else {
+      
+      return await rawResponse.json();
+    }
   };
   
   validateFieldAsync = async (name, value) => {
@@ -465,9 +493,14 @@ export default class Dashboard extends Component {
         {
           this.state.activeTab === "levels" &&
           <LevelsList
-            levels={this.state.levels.activeList}
-            levelsAmount={this.state.levels.activeCount}
+            //levels={this.state.levels.activeList}
+            levels={[]}
+            //levelsAmount={this.state.levels.activeCount}
+            levelsAmount="4"
             onLevelDelete={this.deleteLevelAsync}
+            onGetLevelsList={this.getAllLevelsAsync}
+            onLoadingEnable={this.enableLoading}
+            onLoadingDisable={this.disableLoading}
           />
         }
         

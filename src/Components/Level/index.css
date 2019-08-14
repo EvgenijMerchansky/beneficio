@@ -8,6 +8,7 @@
     align-items: center;
     overflow: hidden;
     margin-bottom: 10px;
+    height: 200px;
 }
 
 .info-wrapper {
@@ -20,8 +21,8 @@
 }
 
 .level-img {
-    width: 205px;
-    height: 205px;
+    width: 200px;
+    height: 200px;
     background-size: cover;
     border-right: solid 1px #e4e4e5;
 }
@@ -37,31 +38,32 @@
 .delete-level-wrapper {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-end;
     width: 50%;
-    height: 40px;
     text-align: right;
+    height: inherit;
 }
 
 .delete-level-button {
-    width: 60px;
-    height: inherit;
-    margin-right: 30px;
-    background-color: #ff2a02;
-    border: none;
+    width: 30px;
+    height: 30px;
+    margin: 15px 15px 0 0;
+    background-color: #f9f8fd;
+    border: solid 2px #ff2a02;
     cursor: pointer;
-    color: white;
-    font-size: 15px;
+    color: #ff2a02;
+    font-size: 16px;
     outline: none;
     -webkit-transition: all 0.5s;
     -moz-transition: all 0.5s;
     -o-transition: all 0.5s;
     transition: all 0.5s;
-    border-radius: 5px;
+    border-radius: 50px;
     font-weight: 400;
 }
 
 .delete-level-button:hover {
     background-color: #d60600;
+    color: white;
 }
