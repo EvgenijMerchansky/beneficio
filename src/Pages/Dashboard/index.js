@@ -181,6 +181,7 @@ export default class Dashboard extends Component {
     let confirm = window.confirm("Do you really want CREATE this level ?");
     
     if (!confirm) {
+      this.setState(state => ({ ...state, loading: false }));
       return false;
     }
   
