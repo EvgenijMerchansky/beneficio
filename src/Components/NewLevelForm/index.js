@@ -24,11 +24,12 @@ export default class Dashboard extends Component {
       steps,
       temporaryStep,
       stepValid,
-      valid
+      valid,
+      levelType
     } = this.props;
   
     return [
-      <h1 key="1" className="Login-title">New level</h1>,
+      <h1 key="1" className="Login-title">New {levelType === 1 ? "level" : "drop"}</h1>,
       <div key="2" className="form-wrapper">
         <form onSubmit={(e) => handleSubmitAsync(e)}>
           <FormGroup controlId="text" bsSize="large">

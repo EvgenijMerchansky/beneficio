@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import LoaderWrapper from '../../Components/Loader/index';
 import NewLevelForm from '../../Components/NewLevelForm/index';
 import LevelsList from '../../Components/LevelsList/index';
+import LevelTypeTabs from '../../Components/LevelTypeTabs/index';
 import Metrics from '../../Components/Metrics/index';
 import { Button } from "react-bootstrap";
 import { CREATE_LEVEL, REFRESH_TOKEN, GET_LEVELS_LIST, DELETE_LEVEL } from '../../constants/index';
@@ -102,7 +103,8 @@ export default class Dashboard extends Component {
         refreshToken: "",
         expires: ""
       },
-      activeTab: "create"
+      activeTab: "create",
+      levelType: 1,
     };
   }
   
@@ -185,6 +187,7 @@ export default class Dashboard extends Component {
     let { email, password } = JSON.parse(localStorage.getItem("info"));
     
     const body = {
+      levelType: this.state.levelType,
       logoUrl: this.state.logoUrl.value,
       title: this.state.title.value,
       time: this.state.time.value,
@@ -262,7 +265,11 @@ export default class Dashboard extends Component {
     })();
   };
   
-  deleteLevelAsync = async (levelId) => {
+  changeLevelType = (type) => {
+    this.setState(state => ({ ...state, levelType: type }))
+  };
+  
+  deleteLevelAsync = async (levelId, levelType) => {
     
     let confirm = window.confirm("Do you really want DELETE this level ?");
   
@@ -275,6 +282,7 @@ export default class Dashboard extends Component {
     let { email, password } = JSON.parse(localStorage.getItem("info"));
   
     const body = {
+      type: levelType,
       levelId: levelId,
       injection: {
         email: email,
@@ -470,6 +478,16 @@ export default class Dashboard extends Component {
         
         {
           this.state.activeTab === "create" &&
+          <LevelTypeTabs
+            onChangeLevelType={this.changeLevelType}
+            levelType={this.state.levelType}
+            leftTitle="Create level"
+            rightTitle="Create drop"
+          />
+        }
+        
+        {
+          this.state.activeTab === "create" &&
           <NewLevelForm
             handleSubmitAsync={this.handleSubmitAsync}
             validateFieldAsync={this.validateFieldAsync}
@@ -487,6 +505,7 @@ export default class Dashboard extends Component {
             temporaryStep={this.state.temporaryStep}
             stepValid={this.state.stepValid}
             valid={valid}
+            levelType={this.state.levelType}
           />
         }
         
@@ -495,6 +514,8 @@ export default class Dashboard extends Component {
           <LevelsList
             onLevelDelete={this.deleteLevelAsync}
             onGetLevelsList={this.getAllLevelsAsync}
+            levelType={this.state.levelType}
+            activeTab={this.state.activeTab}
           />
         }
         

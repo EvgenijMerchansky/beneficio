@@ -10,7 +10,7 @@ export default class Level extends Component {
     
     return(
       <div key={id+title} className="container-level">
-        <img className="level-img" src={logoUrl}/>
+        <img className="level-img" src={logoUrl} alt="logo"/>
         <div className="info-wrapper">
           <p className="level-info-subtitle"><span className="subtitle-wrapper">Title:</span> {title}</p>
           <p className="level-info-subtitle"><span className="subtitle-wrapper">Possible earnings:</span> ${possibleEarnings}</p>
