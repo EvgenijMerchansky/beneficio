@@ -68,9 +68,6 @@ export default class LevelsList extends Component {
             />
           ) :
             this.state.levels.activeDropsList.map(item => {
-              
-              console.log(item.id, 'ID ID')
-              
               return (
                 <Level
                   key={item.id+item.percentPrice}

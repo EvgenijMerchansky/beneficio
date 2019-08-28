@@ -27,6 +27,13 @@ export default class Tabs extends Component {
           </Button>
           <Button
             onClick={e => switchTab(e.target.value)}
+            className={`nav-tab navigation-tabs-create ${activeTab === "lottery" ? "active-tab" : "common-tab"}`}
+            value="lottery"
+          >
+            Lottery
+          </Button>
+          <Button
+            onClick={e => switchTab(e.target.value)}
             className={`nav-tab navigation-tabs-metrics ${activeTab === "metrics" ? "active-tab" : "common-tab"}`}
             value="metrics"
           >

@@ -33,7 +33,7 @@ export default class Dashboard extends Component {
       <div key="2" className="form-wrapper">
         <form onSubmit={(e) => handleSubmitAsync(e)}>
           <FormGroup controlId="text" bsSize="large">
-            <p className="form-subtitle">Logo url (Level logotype link):</p>
+            <p className="form-subtitle">Logo url ({levelType === 1 ? "Level" : "Drop"} logotype link):</p>
             <FormControl
               placeholder="Logo url"
               autoFocus
@@ -46,7 +46,7 @@ export default class Dashboard extends Component {
           </FormGroup>
           <div className="multi-column-fields">
             <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-              <p className="form-multiply-subtitle">Title (Level title - max 25 characters!):</p>
+              <p className="form-multiply-subtitle">Title ({levelType === 1 ? "level" : "drop"} title - max 25 characters!):</p>
               <FormControl
                 placeholder="Title"
                 autoFocus
@@ -58,7 +58,7 @@ export default class Dashboard extends Component {
               />
             </FormGroup>
             <FormGroup controlId="text" className="multiply-form-group" bsSize="large">
-              <p className="form-multiply-subtitle">Time (Level passing time):</p>
+              <p className="form-multiply-subtitle">Time ({levelType === 1 ? "level" : "drop"} passing time):</p>
               <FormControl
                 autoFocus
                 placeholder="Time"
@@ -71,7 +71,7 @@ export default class Dashboard extends Component {
             </FormGroup>
           </div>
           <FormGroup controlId="text" bsSize="large">
-            <p className="form-subtitle">Description (Short level description):</p>
+            <p className="form-subtitle">Description (Short {levelType === 1 ? "level" : "drop"} description):</p>
             <FormControl
               autoFocus
               placeholder="Description"
@@ -172,7 +172,7 @@ export default class Dashboard extends Component {
             disabled={!valid}
             type="submit"
           >
-            Create level
+            Create {levelType === 1 ? "level" : "drop"}
           </Button>
         </form>
       </div>

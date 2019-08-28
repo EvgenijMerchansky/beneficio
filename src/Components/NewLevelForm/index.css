@@ -37,6 +37,7 @@
     border-style: solid;
     outline: none;
     border-width: 1px;
+    resize: none;
 }
 
 .multiply-form-group {

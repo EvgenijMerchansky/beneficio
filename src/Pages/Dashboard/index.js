@@ -1,11 +1,20 @@
 import React, { Component } from "react";
+import exportFromJSON from 'export-from-json'
 import LoaderWrapper from '../../Components/Loader/index';
 import NewLevelForm from '../../Components/NewLevelForm/index';
 import LevelsList from '../../Components/LevelsList/index';
 import LevelTypeTabs from '../../Components/LevelTypeTabs/index';
 import Metrics from '../../Components/Metrics/index';
+import Lottery from '../../Components/Lottery/index';
 import { Button } from "react-bootstrap";
-import { CREATE_LEVEL, REFRESH_TOKEN, GET_LEVELS_LIST, DELETE_LEVEL } from '../../constants/index';
+import {
+  CREATE_LEVEL,
+  REFRESH_TOKEN,
+  GET_LEVELS_LIST,
+  DELETE_LEVEL,
+  GET_LOTTERY_TICKET,
+  FINISH_LOTTERY
+} from '../../constants/index';
 import Tabs from "../../Components/Tabs/index";
 
 import './index.css';
@@ -52,7 +61,9 @@ const globalReseter = {
     description: "",
     imageUrl: "",
   },
-  
+  lotteryTicket: {},
+  lotteryTicketExists: undefined,
+  lotteryResult: [],
   stepValid: false,
   loading: false
 };
@@ -103,6 +114,9 @@ export default class Dashboard extends Component {
         refreshToken: "",
         expires: ""
       },
+      lotteryTicket: {},
+      lotteryTicketExists: undefined,
+      lotteryResult: [],
       activeTab: "create",
       levelType: 1,
     };
@@ -119,6 +133,16 @@ export default class Dashboard extends Component {
       this.props.history.push('/');
     }
   }
+  
+  componentDidMount() {
+    this.runAsyncCalls();
+  }
+  
+  runAsyncCalls = () => {
+    (async() => {
+      await this.getLotteryDataAsync();
+    })()
+  };
   
   logOutAsync = async () => {
     let confirmation = window.confirm("Do you really want to LEAVE?");
@@ -137,8 +161,6 @@ export default class Dashboard extends Component {
   };
   
   refreshTokenFuncAsync = async () => {
-    
-  
     this.setState(state => ({ ...state, loading: true }));
   
     let { userId } = JSON.parse(localStorage.getItem("info"));
@@ -173,7 +195,58 @@ export default class Dashboard extends Component {
     return true;
   };
   
-  handleSubmitAsync = async (e) => {
+  getLotteryDataAsync = async () => {
+    this.setState(state => ({ ...state, loading: true }));
+  
+    const settings = {
+      method: "GET",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    };
+  
+    (async () => {
+      const rawResponse = await fetch(GET_LOTTERY_TICKET, settings);
+    
+      if (rawResponse.status > 205 && rawResponse.status < 500) {
+  
+        this.setState(state => ({
+          ...state,
+          lotteryTicket: {},
+          lotteryTicketExists: false,
+          loading: false
+        }));
+        
+        return false;
+      }
+  
+      let result = await rawResponse.json();
+      
+      this.setState(state => ({
+        ...state,
+        lotteryTicket: result,
+        lotteryTicketExists: true,
+        loading: false
+      }));
+    })();
+  };
+  
+  createNewLotteryTicketAsync = async e => {
+    e.preventDefault();
+  
+    let confirm = window.confirm("Do you really want CREATE this lottery ?");
+  
+    if (!confirm) {
+      this.setState(state => ({ ...state, loading: false }));
+      return false;
+    }
+    
+    // ...
+  };
+  
+  handleSubmitAsync = async e => {
     e.preventDefault();
   
     this.setState(state => ({ ...state, loading: true }));
@@ -268,6 +341,89 @@ export default class Dashboard extends Component {
   
   changeLevelType = (type) => {
     this.setState(state => ({ ...state, levelType: type }))
+  };
+  
+  finishLotteryAsync = async () => {
+    let confirm = window.confirm("Do you really want FINISH this lottery ?");
+  
+    if (!confirm) {
+      return false;
+    }
+    
+    this.setState(state => ({ ...state, loading: true }));
+  
+    let { email, password } = JSON.parse(localStorage.getItem("info"));
+  
+    const body = {
+      injection: {
+        email: email,
+        password: password
+      }
+    };
+  
+    const settings = {
+      method: "POST",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.state.creeds.accessToken}`
+      },
+      body: JSON.stringify(body)
+    };
+  
+    (async () => {
+  
+      const rawResponse = await fetch(FINISH_LOTTERY, settings);
+  
+      if (rawResponse.status > 205 && rawResponse.status < 500) {
+        await this.refreshTokenFuncAsync();
+  
+        const newSettings = {
+          method: "POST",
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.state.creeds.accessToken}`,
+            'body': JSON.stringify(body)
+          }
+        };
+  
+        let response = await fetch(FINISH_LOTTERY, newSettings);
+        let result = await response.json();
+        
+        this.setState(state => ({
+          ...state,
+          lotteryResult: result,
+          lotteryTicket: {},
+          lotteryTicketExists: undefined,
+          loading: false
+        }));
+  
+        const fileName = "download";
+        const exportType = "xls";
+  
+        exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+        
+        return false;
+      }
+  
+      let result = await rawResponse.json();
+      
+      this.setState(state => ({
+        ...state,
+        lotteryResult: result,
+        lotteryTicket: {},
+        lotteryTicketExists: undefined,
+        loading: false
+      }));
+  
+      const fileName = "download";
+      const exportType = "xls";
+  
+      exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+    })()
   };
   
   deleteLevelAsync = async (levelId, levelType) => {
@@ -519,11 +675,21 @@ export default class Dashboard extends Component {
             activeTab={this.state.activeTab}
           />
         }
+  
+        {
+          this.state.activeTab === "lottery" &&
+          <Lottery
+            lotteryTicketExists={this.state.lotteryTicketExists}
+            lotteryTicket={this.state.lotteryTicket}
+            onLotteryFinish={this.finishLotteryAsync}
+            onLotteryTicketCreate={this.createNewLotteryTicketAsync}
+          />
+        }
         
         {
           this.state.activeTab === "metrics" && <Metrics/>
         }
-        
+  
         <Button
           className="log-out-btn"
           onClick={() => this.logOutAsync()}
