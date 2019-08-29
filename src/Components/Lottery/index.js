@@ -58,19 +58,19 @@ const Form = ({
         onSubmit={e => onLotteryTicketCreate(e)}
       >
         <input
-          onChange={e => onValidateTicketField("ticketName", e.target.value, 100)}
+          onChange={e => onValidateTicketField("ticketName", e.target.value, 14)}
           className="lottery-ticket-form-field"
           placeholder="Enter lottery name"
           value={ticketName}
         />
         <textarea
-          onChange={e => onValidateTicketField("ticketDescription", e.target.value, 1000)}
+          onChange={e => onValidateTicketField("ticketDescription", e.target.value, 14)}
           className="lottery-ticket-form-field lottery-ticket-form-field-text-area"
           placeholder="Enter lottery description"
           value={ticketDescription}
         />
         <input
-          onChange={e => onValidateTicketField("ticketFinishDate", e.target.value, 50)}
+          onChange={e => onValidateTicketField("ticketFinishDate", e.target.value, 16)}
           className="lottery-ticket-form-field"
           placeholder="Enter lottery finish date like (02.11.2019 18:00):"
           value={ticketFinishDate}
@@ -88,7 +88,7 @@ const Form = ({
           value={ticketPrice}
         />
         <button
-          disabled={!ticketIsValid} // dynamic
+          disabled={!ticketIsValid}
           type="submit"
           className={ticketIsValid ? "lottery-ticket-form-submit" : "lottery-ticket-form-submit-disable"} // dynamic disable/enable classes
         >
