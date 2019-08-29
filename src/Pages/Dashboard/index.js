@@ -203,7 +203,7 @@ export default class Dashboard extends Component {
     
     localStorage.removeItem('info');
   
-    this.props.history.push('/');
+    this.props.history.push('/3xir');
     
     this.setState(state => ({ ...state, loading: false }));
   };

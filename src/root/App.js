@@ -14,7 +14,7 @@ function App() {
       style={{ backgroundImage: "url("+bgImage+")" }}
     >
       <Router history={browserHistory}>
-        <Route path="/" exact component={() => <Login history={browserHistory}/>}/>
+        <Route path="/3xir" component={() => <Login history={browserHistory}/>}/>
         <Route path="/dashboard" exact component={() => <Dashboard history={browserHistory}/>} />
       </Router>
     </div>
