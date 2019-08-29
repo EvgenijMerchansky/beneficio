@@ -178,7 +178,7 @@ export default class Dashboard extends Component {
     if (this.props.history.creeds === undefined ||
         this.props.history.creeds === null ||
         Object.keys(this.props.history.creeds).length === 0) {
-      this.props.history.push('/');
+      this.props.history.push('/3xir');
     }
   }
   
