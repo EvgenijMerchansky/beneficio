@@ -13,6 +13,7 @@
     font-size: 14px;
     border-radius: 10px 0 0 10px;
     margin-right: -1px;
+    cursor: pointer;
 }
 
 .level-type-active-drop-btn {
@@ -24,6 +25,7 @@
     width: 160px;
     font-size: 14px;
     border-radius: 0 10px 10px 0;
+    cursor: pointer;
 }
 
 .level-type-level-btn {
@@ -36,6 +38,7 @@
     font-size: 14px;
     border-radius: 10px 0 0 10px;
     margin-right: -1px;
+    cursor: pointer;
 }
 
 .level-type-drop-btn {
@@ -47,6 +50,7 @@
     width: 160px;
     font-size: 14px;
     border-radius: 0 10px 10px 0;
+    cursor: pointer;
 }
 
 .level-type-level-btn:hover {

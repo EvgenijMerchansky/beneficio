@@ -2,7 +2,10 @@ import React, { Component } from "react";
 
 import './index.css';
 
-const Ticket = ({ lotteryTicket, onLotteryFinish }) => {
+const Ticket = ({
+  lotteryTicket,
+  onLotteryFinish
+}) => {
   return (
     <div className="lottery-ticket-container">
       <div className="lottery-ticket-content">
@@ -38,7 +41,16 @@ const Ticket = ({ lotteryTicket, onLotteryFinish }) => {
   )
 };
 
-const Form = ({ onLotteryTicketCreate }) => {
+const Form = ({
+  onLotteryTicketCreate,
+  onValidateTicketField,
+  ticketName,
+  ticketDescription,
+  ticketFinishDate,
+  ticketPrize,
+  ticketPrice,
+  ticketIsValid
+}) => {
   return (
     <div className="lottery-ticket-form-wrapper">
       <form
@@ -46,39 +58,39 @@ const Form = ({ onLotteryTicketCreate }) => {
         onSubmit={e => onLotteryTicketCreate(e)}
       >
         <input
-          onChange={() => {}}
+          onChange={e => onValidateTicketField("ticketName", e.target.value, 100)}
           className="lottery-ticket-form-field"
           placeholder="Enter lottery name"
-          value={''}
+          value={ticketName}
         />
         <textarea
-          onChange={() => {}}
+          onChange={e => onValidateTicketField("ticketDescription", e.target.value, 1000)}
           className="lottery-ticket-form-field lottery-ticket-form-field-text-area"
           placeholder="Enter lottery description"
-          value={''}
+          value={ticketDescription}
         />
         <input
-          onChange={() => {}}
+          onChange={e => onValidateTicketField("ticketFinishDate", e.target.value, 50)}
           className="lottery-ticket-form-field"
           placeholder="Enter lottery finish date like (02.11.2019 18:00):"
-          value={''}
+          value={ticketFinishDate}
         />
         <input
-          onChange={() => {}}
+          onChange={e => onValidateTicketField("ticketPrize", e.target.value, 20)}
           className="lottery-ticket-form-field"
-          placeholder="Enter lottery prize amount"
-          value={''}
+          placeholder="Enter lottery prize amount like: 150.00"
+          value={ticketPrize}
         />
         <input
-          onChange={() => {}}
+          onChange={e => onValidateTicketField("ticketPrice", e.target.value, 20)}
           className="lottery-ticket-form-field"
-          placeholder="Enter lottery price for user"
-          value={''}
+          placeholder="Enter lottery price for user like: 5.00"
+          value={ticketPrice}
         />
         <button
-          disabled={true} // dynamic
+          disabled={!ticketIsValid} // dynamic
           type="submit"
-          className="lottery-ticket-form-submit" // dynamic disable/enable classes
+          className={ticketIsValid ? "lottery-ticket-form-submit" : "lottery-ticket-form-submit-disable"} // dynamic disable/enable classes
         >
           Create lottery ticket!
         </button>
@@ -97,16 +109,35 @@ export default class Lottery extends Component {
     let {
       lotteryTicket,
       onLotteryFinish,
-      onLotteryTicketCreate
+      onLotteryTicketCreate,
+      onValidateTicketField,
+      ticketName,
+      ticketDescription,
+      ticketFinishDate,
+      ticketPrize,
+      ticketPrice,
+      ticketIsValid
     } = this.props;
     
     return [
       <h1 key="1" className="Login-title">Lottery:</h1>,
+      <p className="lottery-subtitle">
+        *after pushing on "Excel" button, lottery will be stopped and you will get excel file with users list*
+      </p>,
       <div key="2" className="container-lottery">
         {
           this.props.lotteryTicketExists ?
             <Ticket lotteryTicket={lotteryTicket} onLotteryFinish={onLotteryFinish}/> :
-            <Form onLotteryTicketCreate={onLotteryTicketCreate}/>
+            <Form
+              onLotteryTicketCreate={onLotteryTicketCreate}
+              onValidateTicketField={onValidateTicketField}
+              ticketName={ticketName}
+              ticketDescription={ticketDescription}
+              ticketFinishDate={ticketFinishDate}
+              ticketPrize={ticketPrize}
+              ticketPrice={ticketPrice}
+              ticketIsValid={ticketIsValid}
+            />
         }
       </div>
     ]

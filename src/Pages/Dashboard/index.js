@@ -13,7 +13,8 @@ import {
   GET_LEVELS_LIST,
   DELETE_LEVEL,
   GET_LOTTERY_TICKET,
-  FINISH_LOTTERY
+  FINISH_LOTTERY,
+  CREATE_LOTTERY_TICKET
 } from '../../constants/index';
 import Tabs from "../../Components/Tabs/index";
 
@@ -23,6 +24,34 @@ const temporaryStepReseter = {
   title: "",
   description: "",
   imageUrl: "",
+};
+
+const ticketReseter = {
+  ticketName:  {
+    value: "",
+    isValid: false
+  },
+  ticketDescription:  {
+    value: "",
+    isValid: false
+  },
+  ticketFinishDate:  {
+    value: "",
+    isValid: false
+  },
+  ticketPrize:  {
+    value: "",
+    isValid: false
+  },
+  ticketPrice:  {
+    value: "",
+    isValid: false
+  },
+  temporaryStep: {
+    title: "",
+    description: "",
+    imageUrl: "",
+  }
 };
 
 const globalReseter = {
@@ -55,7 +84,6 @@ const globalReseter = {
     value: "",
     isValid: false
   },
-  
   temporaryStep: {
     title: "",
     description: "",
@@ -113,6 +141,26 @@ export default class Dashboard extends Component {
         accessToken: "",
         refreshToken: "",
         expires: ""
+      },
+      ticketName:  {
+        value: "",
+        isValid: false
+      },
+      ticketDescription:  {
+        value: "",
+        isValid: false
+      },
+      ticketFinishDate:  {
+        value: "",
+        isValid: false
+      },
+      ticketPrize:  {
+        value: "",
+        isValid: false
+      },
+      ticketPrice:  {
+        value: "",
+        isValid: false
       },
       lotteryTicket: {},
       lotteryTicketExists: undefined,
@@ -236,14 +284,89 @@ export default class Dashboard extends Component {
   createNewLotteryTicketAsync = async e => {
     e.preventDefault();
   
-    let confirm = window.confirm("Do you really want CREATE this lottery ?");
+    let confirm = window.confirm("Do you really want CREATE this lottery ticket?");
   
     if (!confirm) {
       this.setState(state => ({ ...state, loading: false }));
       return false;
     }
+  
+    this.setState(state => ({ ...state, loading: true }));
+  
+    let { email, password } = JSON.parse(localStorage.getItem("info"));
+  
+    const body = {
+      name: this.state.ticketName.value,
+      description: this.state.ticketDescription.value,
+      finishDate: this.state.ticketFinishDate.value,
+      prize: this.state.ticketPrize.value,
+      price: this.state.ticketPrice.value,
+      injection: {
+        email: email,
+        password: password
+      }
+    };
+  
+    const settings = {
+      method: "POST",
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.state.creeds.accessToken}`
+      },
+      body: JSON.stringify(body)
+    };
+  
+    (async () => {
+      const rawResponse = await fetch(CREATE_LOTTERY_TICKET, settings);
     
-    // ...
+      if (rawResponse.status > 205 && rawResponse.status < 500) {
+      
+        let tokenIsRefreshed = await this.refreshTokenFuncAsync();
+      
+        if (!tokenIsRefreshed) {
+          await this.refreshTokenFuncAsync();
+        }
+  
+        const newSettings = {
+          method: "POST",
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.state.creeds.accessToken}`
+          },
+          body: JSON.stringify(body)
+        };
+  
+        let response = await fetch(CREATE_LOTTERY_TICKET, newSettings);
+  
+        if (response.status > 205 && response.status < 500) {
+          window.alert("Incorrect data entered into fields. Please recheck all fields!");
+    
+          return false;
+        }
+  
+        this.setState(state => ({
+          ...state,
+          ...ticketReseter,
+          loading: false
+        }));
+  
+        await this.getLotteryDataAsync();
+  
+        return false;
+      }
+  
+      this.setState(state => ({
+        ...state,
+        ...ticketReseter,
+        loading: false
+      }));
+  
+      await this.getLotteryDataAsync();
+    })();
   };
   
   handleSubmitAsync = async e => {
@@ -401,10 +524,12 @@ export default class Dashboard extends Component {
           loading: false
         }));
   
-        const fileName = "download";
-        const exportType = "xls";
+        if (this.state.lotteryResult.length > 0) {
+          const fileName = "download";
+          const exportType = "xls";
   
-        exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+          exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+        }
         
         return false;
       }
@@ -419,10 +544,12 @@ export default class Dashboard extends Component {
         loading: false
       }));
   
-      const fileName = "download";
-      const exportType = "xls";
-  
-      exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+      if (this.state.lotteryResult.length > 0) {
+        const fileName = "download";
+        const exportType = "xls";
+    
+        exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+      }
     })()
   };
   
@@ -526,15 +653,23 @@ export default class Dashboard extends Component {
       let response = await fetch(GET_LEVELS_LIST, newSettings);
 
       return await response.json();
-      
-    } else {
-      
-      return await rawResponse.json();
     }
+      
+    return await rawResponse.json();
   };
   
   validateFieldAsync = async (name, value) => {
     if (value === '' || value === null || value === " ") {
+      this.setState(state => ({ ...state, [name]: { value: value, isValid: false } }));
+      
+      return false;
+    }
+  
+    this.setState(state => ({ ...state, [name]: { value: value, isValid: true } }))
+  };
+  
+  validateTicketFieldAsync = async (name, value, possibleLength) => {
+    if (value === '' || value === null || value === " " || value.length > possibleLength) {
       this.setState(state => ({ ...state, [name]: { value: value, isValid: false } }));
       
       return false;
@@ -683,6 +818,19 @@ export default class Dashboard extends Component {
             lotteryTicket={this.state.lotteryTicket}
             onLotteryFinish={this.finishLotteryAsync}
             onLotteryTicketCreate={this.createNewLotteryTicketAsync}
+            onValidateTicketField={this.validateTicketFieldAsync}
+            onGetLotteryData={this.getLotteryDataAsync}
+            ticketName={this.state.ticketName.value}
+            ticketDescription={this.state.ticketDescription.value}
+            ticketFinishDate={this.state.ticketFinishDate.value}
+            ticketPrize={this.state.ticketPrize.value}
+            ticketPrice={this.state.ticketPrice.value}
+            ticketIsValid={
+              this.state.ticketName.isValid &&
+              this.state.ticketDescription.isValid &&
+              this.state.ticketFinishDate.isValid &&
+              this.state.ticketPrize.isValid &&
+              this.state.ticketPrice.isValid}
           />
         }
         

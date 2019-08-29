@@ -79,9 +79,7 @@ export default class LevelsList extends Component {
                   time={item.time}
                 />
               )
-            }
-              
-            )
+            })
         }
       </div>
     ]
