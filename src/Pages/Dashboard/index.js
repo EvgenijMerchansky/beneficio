@@ -498,9 +498,14 @@ export default class Dashboard extends Component {
     (async () => {
   
       const rawResponse = await fetch(FINISH_LOTTERY, settings);
-  
+      
       if (rawResponse.status > 205 && rawResponse.status < 500) {
-        await this.refreshTokenFuncAsync();
+  
+        let tokenIsRefreshed = await this.refreshTokenFuncAsync();
+  
+        if (!tokenIsRefreshed) {
+          await this.refreshTokenFuncAsync();
+        }
   
         const newSettings = {
           method: "POST",
