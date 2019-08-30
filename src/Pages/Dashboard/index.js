@@ -509,8 +509,8 @@ export default class Dashboard extends Component {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.state.creeds.accessToken}`,
-            'body': JSON.stringify(body)
-          }
+          },
+          body: JSON.stringify(body)
         };
   
         let response = await fetch(FINISH_LOTTERY, newSettings);

@@ -63,9 +63,9 @@ const Form = ({
           placeholder="Enter lottery name"
           value={ticketName}
         />
-        <textarea
+        <input
           onChange={e => onValidateTicketField("ticketDescription", e.target.value, 14)}
-          className="lottery-ticket-form-field lottery-ticket-form-field-text-area"
+          className="lottery-ticket-form-field"
           placeholder="Enter lottery description"
           value={ticketDescription}
         />
