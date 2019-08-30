@@ -238,8 +238,6 @@ export default class Dashboard extends Component {
   
     this.setState(state => ({ ...state, creeds: { ...content }, loading: false }));
   
-    window.alert("Refresh token success!");
-    
     return true;
   };
   
