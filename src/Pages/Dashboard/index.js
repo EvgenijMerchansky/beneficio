@@ -534,9 +534,13 @@ export default class Dashboard extends Component {
           const exportType = "xls";
   
           exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+          return false;
+        } else {
+          
+          window.alert("Sorry, nobody bought a single lottery ticket :(");
+          
+          return false;
         }
-        
-        return false;
       }
   
       let result = await rawResponse.json();
@@ -554,6 +558,12 @@ export default class Dashboard extends Component {
         const exportType = "xls";
     
         exportFromJSON({ data: this.state.lotteryResult, fileName, exportType });
+        return false;
+      } else {
+  
+        window.alert("Sorry, nobody bought a single lottery ticket :(");
+  
+        return false;
       }
     })()
   };
