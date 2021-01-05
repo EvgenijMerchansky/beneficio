@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://merchansky-001-site1.dtempurl.com",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "export-from-json": "^1.1.4",
     "history": "^4.9.0",
     "json2xls": "^0.1.2",
